@@ -36,3 +36,21 @@ export function sendResponseAsJson(
     throw new Error("The type of data must be an object");
   }
 }
+
+export function parseBody(this: http.IncomingMessage) {
+  return new Promise((resolve, reject) => {
+    this.body = [];
+    this.on("data", (chunk: Buffer) => {
+      this.body.push(chunk);
+    }).on("end", () => {
+      this.body = Buffer.concat(this?.body || []).toString("utf-8");
+      try {
+        const parsedJson = JSON.parse(this.body);
+        this.body = parsedJson;
+        resolve(this.body);
+      } catch (e) {
+        resolve("");
+      }
+    });
+  });
+}

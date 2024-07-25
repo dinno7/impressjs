@@ -3,10 +3,11 @@ import http from "http";
 import path from "path";
 import { EventEmitter } from "stream";
 import {
+  parseBody,
     sendFileResponse,
-  sendFileResponse,
-  sendResponseAsJson,
-from "./utils";
+    sendResponseAsJson,
+    setResponseStatus,
+} from "./utils";
 
 type RouteCallback = (
   req: http.IncomingMessage,
@@ -56,6 +57,8 @@ export default class Impress {
     this.port = 0;
 
     this.server.on("request", async (req, res) => {
+      await parseBody.call(req);
+
       // Add more response object features
       res.status = setResponseStatus.bind(res);
       res.sendFile = sendFileResponse.bind(res);
